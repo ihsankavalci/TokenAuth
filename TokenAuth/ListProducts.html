@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+	<meta charset="utf-8" />
+</head>
+<body>
+    <div class="log-form">
+        <h2>Login</h2>
+
+        <input type="text" title="username" id="username" />
+        <input type="password" title="username" id="password" />
+        <button type="button" class="btn">Login</button>
+
+    </div>
+</body>
+</html>
+<script>
+    $('.btn').on('click', function () {
+        $.ajax(
+        {
+            url: "/token",
+            type: "POST",
+            data: $.param({ grant_type: 'password', username: $("#username").val(), password: $("#password").val() }),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            success: function (resp) {
+                sessionStorage.setItem('userName', resp.userName);
+                sessionStorage.setItem('accessToken', resp.access_token);
+                var authHeaders = {};
+                authHeaders.Authorization = 'Bearer ' + resp.access_token;
+                $.ajax({
+                    url: "/api/Products/List",
+                    type: "GET",
+                    headers: authHeaders,
+                    success: function (response) {
+                        alert(response);
+                    }
+                });
+            },
+            error: function (resp) { alert(JSON.stringify(resp)); }
+        })
+    })
+</script>
